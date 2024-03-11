@@ -111,13 +111,13 @@ app.UseCors(AllowSomeStuff); // Middleware til at bruge CORS politik
     // Opstemning af en kommentar
     app.MapPut("/api/posts/{postId}/comments/{commentId}/upvote", async (DataService service, int postId, int commentId) =>
     {
-        return await service.UpvoteComment(commentId);
+        return await service.UpvoteComment(commentId, postId);
     });
 
     // Nedstemning af en kommentar
     app.MapPut("/api/posts/{postId}/comments/{commentId}/downvote", async (DataService service, int postId, int commentId) =>
     {
-        return await service.DownvoteComment(commentId);
+        return await service.DownvoteComment(commentId, postId);
     });
 
 }; 

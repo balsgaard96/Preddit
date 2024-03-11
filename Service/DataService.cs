@@ -31,7 +31,7 @@ public class DataService
             var user8 = new User { Username = "Kevin" };
             var user9 = new User { Username = "Isabella" };
             var user10 = new User { Username = "Keld" };
-            
+
 
             db.Users.AddRange(user1, user2, user3, user4, user5, user6, user7, user8, user9, user10);
 
@@ -67,98 +67,99 @@ public class DataService
 
 
     public List<Post> GetPosts()
-{
-    return db.Posts.Include(p => p.User).ToList();
-}
-
-public Post GetPost(int id)
-{
-    return db.Posts.Include(p => p.User).FirstOrDefault(p => p.Id == id);
-}
-
-public List<User> GetAuthors()
-{
-    return db.Users.ToList();
-}
-
-public User GetAuthor(int id)
-{
-    return db.Users.Include(u => u.Posts).FirstOrDefault(u => u.Id == id);
-}
-
-public async Task<Post> UpvotePost(int id)
-{
-    var post = await db.Posts.FindAsync(id);
-    if (post != null)
     {
-        post.Upvotes++;
-        await db.SaveChangesAsync();
+        return db.Posts.Include(p => p.User).ToList();
     }
-    return post;
-}
 
-public async Task<Post> DownvotePost(int id)
-{
-    var post = await db.Posts.FindAsync(id);
-    if (post != null)
+    public Post GetPost(int id)
     {
-        post.Downvotes++;
-        await db.SaveChangesAsync();
+        return db.Posts.Include(p => p.User).FirstOrDefault(p => p.Id == id);
     }
-    return post;
-}
 
-public async Task<Comment> UpvoteComment(int id)
-{
-    var comment = await db.Comments.FindAsync(id);
-    if (comment != null)
+    public List<User> GetAuthors()
     {
-        comment.Upvotes++;
-        await   db.SaveChangesAsync();
+        return db.Users.ToList();
     }
-    return comment;
-}
 
-public async Task<Comment> DownvoteComment(int id)
-{
-    var comment = await db.Comments.FindAsync(id);
-    if (comment != null)
+    public User GetAuthor(int id)
     {
-        comment.Downvotes++;
-        await db.SaveChangesAsync();
+        return db.Users.Include(u => u.Posts).FirstOrDefault(u => u.Id == id);
     }
-    return comment;
-}
 
-public string CreatePost(string title, string content, int userId)
-{
-    var user = db.Users.FirstOrDefault(u => u.Id == userId);
-    if (user == null)
-        return "User not found";
-
-        var currentTime = DateTime.Now;
-
-        db.Posts.Add(new Post { Title = title, Content = content, User = user, CreationDate = currentTime });
-    db.SaveChanges();
-    return "Post created";
-}
-
-public async Task<Comment> CreateComment(string content, int postId, int userId)
-{
-    var post = await db.Posts.FindAsync(postId);
-        if (post == null)
+    public async Task<Post> UpvotePost(int id)
+    {
+        var post = await db.Posts.FindAsync(id);
+        if (post != null)
         {
-            // Håndter fejl, hvis posten ikke blev fundet
-            return null;
+            post.Upvotes++;
+            await db.SaveChangesAsync();
+        }
+        return post;
+    }
+
+    public async Task<Post> DownvotePost(int id)
+    {
+        var post = await db.Posts.FindAsync(id);
+        if (post != null)
+        {
+            post.Downvotes++;
+            await db.SaveChangesAsync();
+        }
+        return post;
+    }
+
+    public async Task<Comment> UpvoteComment(int commentId, int postId)
+    {
+        var post = db.Posts.Include(c => c.Comments).FirstOrDefault(p => p.Id == postId);
+
+        var comment = post.Comments.FirstOrDefault(c => c.Id == commentId);
+
+        comment.Upvotes++;
+        db.SaveChangesAsync();
+
+        return comment;
+    }
+    public async Task<Comment> DownvoteComment(int commentId, int postId)
+    {
+        var post = db.Posts.Include(c=>c.Comments).FirstOrDefault(p=>p.Id==postId);
+
+        var comment = post.Comments.FirstOrDefault(c => c.Id == commentId);
+           
+        comment.Downvotes++;
+        db.SaveChangesAsync();
+   
+        return comment;
+    }
+
+    public string CreatePost(string title, string content, int userId)
+        {
+            var user = db.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+                return "User not found";
+
+            var currentTime = DateTime.Now;
+
+            db.Posts.Add(new Post { Title = title, Content = content, User = user, CreationDate = currentTime });
+            db.SaveChanges();
+            return "Post created";
         }
 
-        var currentTime = DateTime.Now;
+        public async Task<Comment> CreateComment(string content, int postId, int userId)
+        {
+            var post = await db.Posts.FindAsync(postId);
+            if (post == null)
+            {
+                // Håndter fejl, hvis posten ikke blev fundet
+                return null;
+            }
 
-        var comment = new Comment { Content = content, UserId = userId, CreationDate = currentTime };
-    post.Comments.Add(comment);
-    await db.SaveChangesAsync();
+            var currentTime = DateTime.Now;
 
-    return comment;
-}
+            var comment = new Comment { Content = content, UserId = userId, CreationDate = currentTime };
+            post.Comments.Add(comment);
+            await db.SaveChangesAsync();
 
-}
+            return comment;
+        }
+
+    }
