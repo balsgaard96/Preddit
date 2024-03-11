@@ -33,7 +33,7 @@ public class DataService
             var user10 = new User { Username = "Keld" };
             
 
-            db.Users.AddRange(user1, user2, user3, user4, user5, user6, user7, user8, user8, user9, user10);
+            db.Users.AddRange(user1, user2, user3, user4, user5, user6, user7, user8, user9, user10);
 
             var currentTime = DateTime.Now;
 
